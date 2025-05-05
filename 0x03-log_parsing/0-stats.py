@@ -30,25 +30,21 @@ def main():
     }
     valid_status_codes = status_codes.keys()
 
-    # Regex pattern to validate and extract information from log lines
     pattern = r'^\S+ - \[\S+ \S+\] "GET /projects/260 HTTP/1.1" (\d+) (\d+)$'
 
     try:
         for line in sys.stdin:
             line_count += 1
 
-            # Try to match and extract data using regex
             match = re.match(pattern, line.strip())
             if match:
                 status_code, file_size = match.groups()
 
-                # Update file size
                 try:
                     total_size += int(file_size)
                 except ValueError:
                     pass
 
-                # Update status code count
                 try:
                     status_code_int = int(status_code)
                     if status_code_int in valid_status_codes:
@@ -56,15 +52,12 @@ def main():
                 except ValueError:
                     pass
 
-            # Print stats every 10 lines
             if line_count % 10 == 0:
                 print_stats(total_size, status_codes)
 
     except KeyboardInterrupt:
-        # Handle Ctrl+C
         pass
     finally:
-        # Print final stats
         print_stats(total_size, status_codes)
 
 
