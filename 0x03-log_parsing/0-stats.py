@@ -1,65 +1,53 @@
 #!/usr/bin/python3
-"""
-Script that reads stdin line by line and computes metrics
-"""
+
+"""Script that reads stdin line by line and computes metrics"""
+
 import sys
-import re
 
 
-def print_stats(total_size, status_codes):
+def print_stats(status_codes, total_size):
     """Print accumulated statistics"""
-    print("File size: {}".format(total_size))
-    for code in sorted(status_codes.keys()):
-        if status_codes[code] > 0:
-            print("{}: {}".format(code, status_codes[code]))
+    print("File size: {:d}".format(total_size))
+    for i in sorted(status_codes.keys()):
+        if status_codes[i] != 0:
+            print("{}: {:d}".format(i, status_codes[i]))
 
 
-def main():
-    """Main function to process the log input"""
-    line_count = 0
-    total_size = 0
-    status_codes = {
-        200: 0,
-        301: 0,
-        400: 0,
-        401: 0,
-        403: 0,
-        404: 0,
-        405: 0,
-        500: 0
-    }
-    valid_status_codes = status_codes.keys()
+status_codes = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0,
+}
 
-    pattern = r'^\S+ - \[\S+ \S+\] "GET /projects/260 HTTP/1.1" (\d+) (\d+)$'
+line_count = 0
+total_size = 0
 
-    try:
-        for line in sys.stdin:
-            line_count += 1
+try:
+    for line in sys.stdin:
+        if line_count != 0 and line_count % 10 == 0:
+            print_stats(status_codes, total_size)
 
-            match = re.match(pattern, line.strip())
-            if match:
-                status_code, file_size = match.groups()
+        stlist = line.split()
+        line_count += 1
 
-                try:
-                    total_size += int(file_size)
-                except ValueError:
-                    pass
+        try:
+            total_size += int(stlist[-1])
+        except Exception:
+            pass
 
-                try:
-                    status_code_int = int(status_code)
-                    if status_code_int in valid_status_codes:
-                        status_codes[status_code_int] += 1
-                except ValueError:
-                    pass
-
-            if line_count % 10 == 0:
-                print_stats(total_size, status_codes)
-
-    except KeyboardInterrupt:
-        pass
-    finally:
-        print_stats(total_size, status_codes)
+        try:
+            if stlist[-2] in status_codes:
+                status_codes[stlist[-2]] += 1
+        except Exception:
+            pass
+    print_stats(status_codes, total_size)
 
 
-if __name__ == "__main__":
-    main()
+except KeyboardInterrupt:
+    print_stats(status_codes, total_size)
+    raise
