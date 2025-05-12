@@ -4,8 +4,9 @@ function validUTF8(data)
 that determines if a given data set represents a valid UTF-8 encoding.
 """
 
+
 def validUTF8(data):
-    """ Check if a given data set represents a valid UTF-8 encoding """
+    """Check if a given data set represents a valid UTF-8 encoding"""
     num_bytes = 0
 
     for byte in data:
