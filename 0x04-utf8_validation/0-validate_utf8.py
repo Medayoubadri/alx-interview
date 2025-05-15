@@ -10,7 +10,7 @@ def validUTF8(data):
     num_bytes = 0
 
     for byte in data:
-        # Get the number of bytes to expect
+        byte = byte & 255
         if num_bytes == 0:
             if (byte >> 7) == 0b0:
                 continue
@@ -23,7 +23,6 @@ def validUTF8(data):
             else:
                 return False
         else:
-            # Check if the byte is a continuation byte
             if (byte >> 6) != 0b10:
                 return False
             num_bytes -= 1
