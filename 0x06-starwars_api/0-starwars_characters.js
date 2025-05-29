@@ -13,17 +13,23 @@ if (!movieId) {
 // API endpoint for the specific film
 const filmUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}/`;
 
-// Function to fetch character name from character URL
-function fetchCharacterName(characterUrl) {
-  return new Promise((resolve, reject) => {
-    request(characterUrl, (error, response, body) => {
-      if (error) {
-        reject(error);
-      } else {
-        const character = JSON.parse(body);
-        resolve(character.name);
-      }
-    });
+// Function to print characters recursively to maintain order
+function printCharacters(characterUrls, index) {
+  if (index >= characterUrls.length) {
+    return;
+  }
+
+  request(characterUrls[index], (error, response, body) => {
+    if (error) {
+      console.error("Error fetching character data:", error);
+      return;
+    }
+
+    const character = JSON.parse(body);
+    console.log(character.name);
+
+    // Recursively call for the next character
+    printCharacters(characterUrls, index + 1);
   });
 }
 
@@ -42,18 +48,6 @@ request(filmUrl, (error, response, body) => {
   const film = JSON.parse(body);
   const characterUrls = film.characters;
 
-  // Function to process characters sequentially
-  async function processCharacters() {
-    try {
-      for (const characterUrl of characterUrls) {
-        const characterName = await fetchCharacterName(characterUrl);
-        console.log(characterName);
-      }
-    } catch (err) {
-      console.error("Error fetching character data:", err);
-    }
-  }
-
-  // Call the async function
-  processCharacters();
+  // Start printing characters from index 0
+  printCharacters(characterUrls, 0);
 });
